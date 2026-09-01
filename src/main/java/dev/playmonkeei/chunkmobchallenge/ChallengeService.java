@@ -47,6 +47,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Boss;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
@@ -57,6 +58,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.EntityTransformEvent;
@@ -331,6 +333,10 @@ public final class ChallengeService implements Listener {
                 velocity.setZ(inwardSpeed(velocity.getZ(), round.chunk.centerZ() - redirected.getZ()));
             }
             movingMob.getPathfinder().stopPathfinding();
+            if (movingMob.collidesAt(redirected)) {
+                redirected = event.getFrom().clone();
+                velocity = new Vector();
+            }
             movingMob.setVelocity(velocity);
             event.setTo(redirected);
         }
@@ -412,6 +418,13 @@ public final class ChallengeService implements Listener {
         completeRound(round);
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChallengeCreeperExplode(EntityExplodeEvent event) {
+        if (!(event.getEntity() instanceof Creeper creeper)) return;
+        RoundState round = roundFor(creeper);
+        if (round != null) completeRound(round);
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChunkLoad(ChunkLoadEvent event) {
         for (Entity entity : event.getChunk().getEntities()) reconcileChallengeEntity(entity);
@@ -474,10 +487,14 @@ public final class ChallengeService implements Listener {
                     type.getKey().toString());
             Location spawn = findSpawn(world, key, anchor, type);
             try {
-                Entity entity = world.spawnEntity(spawn, type);
-                if (entity instanceof Mob spawned) {
-                    round = candidate;
-                    mob = spawned;
+            Entity entity = world.spawnEntity(spawn, type);
+            if (entity instanceof Mob spawned) {
+                if (spawned.collidesAt(spawn)) {
+                    spawned.remove();
+                    continue;
+                }
+                round = candidate;
+                mob = spawned;
                     break;
                 }
                 entity.remove();
@@ -603,6 +620,11 @@ public final class ChallengeService implements Listener {
         if (run == null || !run.running() || !run.players.containsKey(player.getUniqueId())) return;
         PlayerState state = run.players.get(player.getUniqueId());
         ChunkKey key = ChunkKey.from(destination);
+        if (key.equals(state.roundChunk)) {
+            state.lastChunk = key;
+            savePlayerLocation(player, state);
+            return;
+        }
         if (!force && state.roundChunk == null && key.equals(state.lastChunk)) return;
         RoundState round = run.rounds.get(key);
         boolean created = round == null;
@@ -837,6 +859,7 @@ public final class ChallengeService implements Listener {
                 mob = recoverMob(round);
                 if (mob == null) continue;
             }
+            rescueFromBlocks(round, mob);
             if (!round.chunk.contains(mob.getLocation())) {
                 mob.teleport(clampToChunk(mob.getLocation(), round.chunk));
                 mob.setVelocity(new Vector());
@@ -1082,6 +1105,22 @@ public final class ChallengeService implements Listener {
     private static double movementMargin(Mob mob) {
         double halfWidth = Math.max(mob.getBoundingBox().getWidthX(), mob.getBoundingBox().getWidthZ()) / 2.0;
         return Math.max(0.75, Math.min(7.5, halfWidth + 0.25));
+    }
+
+    private void rescueFromBlocks(RoundState round, Mob mob) {
+        if (!mob.collidesAt(mob.getLocation())) return;
+        Location base = findSpawn(mob.getWorld(), round.chunk, mob.getLocation(), mob.getType());
+        int maxRise = Math.min(24, mob.getWorld().getMaxHeight() - 2 - base.getBlockY());
+        for (int rise = 0; rise <= maxRise; rise++) {
+            Location candidate = base.clone().add(0, rise, 0);
+            if (mob.collidesAt(candidate)) continue;
+            mob.getPathfinder().stopPathfinding();
+            mob.teleport(candidate);
+            mob.setVelocity(new Vector());
+            return;
+        }
+        plugin.getLogger().warning("Challenge-Mob " + mob.getType().getKey()
+                + " konnte nicht aus kollidierenden Blöcken befreit werden.");
     }
 
     private void addTicket(ChunkKey key) {

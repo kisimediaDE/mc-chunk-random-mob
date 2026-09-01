@@ -96,6 +96,8 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [x] Ein direkter Spieler-Kill beendet die Runde.
 - [ ] Fallschaden, Feuer, Sonne, Lava oder ein anderer Mob als Todesursache
       beendet die Runde ebenfalls.
+- [ ] Ein Challenge-Creeper beendet seine Runde durch die eigene Explosion und
+      wird vom Recovery-Wächter nicht erneut erzeugt.
 - [ ] Ein Wasser-Mob darf an Land erscheinen und sein Ersticken zählt.
 - [ ] Enderman, Ghast und Phantom bleiben trotz Teleport-/Flug-KI im Chunk.
 - [ ] Giant und Illusioner können aus `mobs.yml` geladen und gespawnt werden.
@@ -104,6 +106,8 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
       Challenge-Mobs erscheinen.
 - [x] Normale Mobs erscheinen auf einer sicheren Bodenfläche, nicht auf Blättern,
       Baumstämmen oder zufällig in einer Höhle.
+- [ ] Große Mobs wie Ghasts werden nicht zwischen Bäumen oder in anderen zu engen
+      Blockräumen gespawnt; geraten sie später hinein, werden sie befreit.
 - [x] Ein Challenge-Enderdragon erscheint oberhalb des höchsten Geländes im Chunk
       und wird nicht unter die Oberfläche gedrückt.
 - [x] Ein Challenge-Enderdragon außerhalb eines Vanilla-DragonBattle wählt einen
