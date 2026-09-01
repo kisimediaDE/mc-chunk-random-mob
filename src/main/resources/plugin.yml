@@ -1,0 +1,34 @@
+name: ChunkMobChallenge
+version: '1.0.0'
+main: dev.playmonkeei.chunkmobchallenge.ChunkMobChallengePlugin
+api-version: '26.1'
+author: PlayMonkeei
+description: Sessionübergreifende Chunk-Mob-Challenge für Paper 26.1 und 26.2
+commands:
+  chunkchallenge:
+    description: Verwaltet die Chunk Mob Challenge
+    usage: /chunkchallenge <start|stop|status|reload|tags|glowing>
+    aliases: [cc]
+permissions:
+  chunkchallenge.admin:
+    description: Gewährt alle Chunk-Challenge-Rechte
+    default: op
+    children:
+      chunkchallenge.start: true
+      chunkchallenge.stop: true
+      chunkchallenge.status: true
+      chunkchallenge.reload: true
+      chunkchallenge.tags: true
+      chunkchallenge.glowing: true
+  chunkchallenge.start:
+    default: op
+  chunkchallenge.stop:
+    default: op
+  chunkchallenge.status:
+    default: op
+  chunkchallenge.reload:
+    default: op
+  chunkchallenge.tags:
+    default: op
+  chunkchallenge.glowing:
+    default: op
