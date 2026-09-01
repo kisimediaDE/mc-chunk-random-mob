@@ -198,13 +198,17 @@ Danach `hardcore=false` zurücksetzen.
 
 ## 9. Portale und Dimensionen
 
-- [ ] Ein Netherportal kann während einer aktiven Runde nicht benutzt werden.
-- [ ] Nach dem Mob-Tod funktioniert das Netherportal.
-- [ ] Im Nether-Zielchunk startet sofort eine neue Runde.
-- [ ] Rückkehr in die Overworld startet am Ziel ebenfalls eine Runde.
+- [x] Ein Command-Teleport in eine andere Dimension wird während einer aktiven
+      Runde blockiert; die tatsächliche Spieler-Dimension bleibt unverändert.
+- [x] Nach dem Mob-Tod funktioniert derselbe Command-Dimensionswechsel und startet
+      im Zielchunk sofort genau eine neue Runde.
+- [x] Ein Netherportal kann während einer aktiven Runde nicht benutzt werden.
+- [x] Nach dem Mob-Tod funktioniert das Netherportal.
+- [x] Im Nether-Zielchunk startet sofort eine neue Runde.
+- [x] Rückkehr in die Overworld startet am Ziel ebenfalls eine Runde.
 - [ ] Dasselbe Verhalten gilt für das Endportal.
-- [ ] Overworld-, Nether- und End-Chunks mit denselben X/Z-Koordinaten werden als
-      unterschiedliche Runden behandelt.
+- [x] Overworld- und Nether-Chunks mit denselben X/Z-Koordinaten werden als
+      unterschiedliche Runden behandelt; das End bleibt noch offen.
 
 ## 10. Enderdragon und Sieg
 
