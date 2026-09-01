@@ -74,14 +74,17 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [x] `/cc start` erzeugt genau einen Mob im aktuellen Chunk.
 - [x] Der Mob besitzt standardmäßig keinen sichtbaren Nametag und leuchtet nicht.
 - [x] Bei normalen Mobs erscheint eine Bossbar und folgt den Lebenspunkten.
-- [x] Wither und Enderdragon zeigen genau eine Bossbar, auch wenn Paper nach
+- [x] Ein Challenge-Enderdragon zeigt genau eine Bossbar, auch wenn Paper nach
       Logout oder Serverneustart keine native Bossbar mehr bereitstellt.
+- [ ] Ein Challenge-Wither zeigt genau eine Bossbar, auch nach Logout und
+      Serverneustart.
 - [x] Die Border umfasst exakt den aktuellen 16×16-Chunk.
 - [ ] Bauen nach oben und Graben nach unten bleibt möglich.
-- [ ] Die Chunkgrenze kann zu Fuß, sprintend und mit Elytra nicht überschritten
-      werden.
-- [ ] Enderperle und Chorus Fruit können den aktiven Chunk nicht verlassen.
-- [ ] `/tp` aus dem aktiven Chunk wird blockiert.
+- [x] Die Chunkgrenze kann zu Fuß und sprintend nicht überschritten werden.
+- [x] Die Chunkgrenze kann mit Elytra nicht überschritten werden.
+- [x] Enderperle und Chorus Fruit können den aktiven Chunk nicht verlassen.
+- [x] `/tp` aus dem aktiven Chunk wird blockiert. Die Vanilla-Erfolgsmeldung kann
+      erscheinen, die gemessene Spielerposition bleibt jedoch im Challenge-Chunk.
 - [ ] Natürlich gespawnte Mobs können die Chunkgrenze frei überqueren.
 - [x] Der Challenge-Mob kann den Chunk nicht verlassen.
 - [x] An der Chunkkante bleibt der Challenge-Mob beweglich und wird nach innen
@@ -89,17 +92,19 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [x] Nach dem Tod des Challenge-Mobs verschwinden Border und Bossbar.
 - [x] Der Spieler kann sich danach frei im aktuellen Chunk bewegen.
 - [x] Erst der Eintritt in einen anderen Chunk startet genau eine neue Runde.
-- [ ] Rückkehr in einen früher besuchten Chunk startet erneut eine Runde.
+- [x] Rückkehr in einen früher besuchten Chunk startet erneut eine Runde.
 
 ## 4. Beliebige Todesursache und Sondermobs
 
 - [x] Ein direkter Spieler-Kill beendet die Runde.
-- [ ] Fallschaden, Feuer, Sonne, Lava oder ein anderer Mob als Todesursache
-      beendet die Runde ebenfalls.
-- [ ] Ein Challenge-Creeper beendet seine Runde durch die eigene Explosion und
+- [x] Eine andere tatsächliche Todesursache beendet die Runde ebenfalls:
+      Zombie Horse durch Sonnenbrand bestätigt; weitere Ursachen bleiben optional.
+- [x] Ein Challenge-Creeper beendet seine Runde durch die eigene Explosion und
       wird vom Recovery-Wächter nicht erneut erzeugt.
-- [ ] Ein Wasser-Mob darf an Land erscheinen und sein Ersticken zählt.
+- [x] Ein Wasser-Mob darf an Land erscheinen und sein Ersticken zählt (Nautilus
+      bestätigt).
 - [ ] Enderman, Ghast und Phantom bleiben trotz Teleport-/Flug-KI im Chunk.
+      **Enderman bestätigt; Ghast/Phantom noch offen.**
 - [ ] Giant und Illusioner können aus `mobs.yml` geladen und gespawnt werden.
 - [x] Ein zufälliger Enderdragon kann als Challenge-Mob gespawnt werden.
 - [ ] Wither und Warden können als gleich gewichtete
@@ -156,9 +161,9 @@ kurz weiterlaufen gelassen und erst danach mit `stop` beendet wird.
 
 ## 6. Nicht-Hardcore-Tod
 
-- [ ] Allein in einer Runde sterben: Alte verwaiste Runde und Mob werden entfernt.
-- [ ] Nach dem Respawn startet im Respawn-Chunk sofort eine neue Runde.
-- [ ] Tode-Statistik erhöht sich um eins.
+- [x] Allein in einer Runde sterben: Alte verwaiste Runde und Mob werden entfernt.
+- [x] Nach dem Respawn startet im Respawn-Chunk sofort eine neue Runde.
+- [x] Tode-Statistik erhöht sich um eins.
 - [ ] Zwei Spieler teilen eine Runde; einer stirbt: Mob und Runde bleiben für den
       Überlebenden bestehen.
 - [ ] Der gestorbene Spieler startet nach dem Respawn seine eigene Runde oder
@@ -213,7 +218,7 @@ Danach `hardcore=false` zurücksetzen.
 
 ## 11. Konfiguration und Commands
 
-- [ ] Einen Mob aus `mobs.yml` entfernen und `/cc reload` ausführen: Er wird in
+- [x] Einen Mob aus `mobs.yml` entfernen und `/cc reload` ausführen: Er wird in
       zukünftigen Runden nicht mehr gewählt.
 - [ ] Unbekannten Key eintragen: Konsolenwarnung, aber kein Plugin-Absturz.
 - [ ] Doppelten Key eintragen: Konsolenwarnung, nur einmal im Pool.
@@ -222,13 +227,13 @@ Danach `hardcore=false` zurücksetzen.
 - [ ] `mobs.yml` bei gestopptem Server löschen: Beim nächsten Start wird die
       vollständige versionsabhängige Liste neu erzeugt.
 - [x] `/cc status` zeigt eigene Runde und globale Statistiken.
-- [ ] `/cc tags disable` blendet aktuelle und zukünftige Mob-Nametags aus.
+- [x] `/cc tags disable` blendet aktuelle und zukünftige Mob-Nametags aus.
 - [x] `/cc tags enable` blendet die Nametags wieder ein.
-- [ ] Die Nametag-Einstellung bleibt nach Logout und Serverneustart erhalten.
+- [x] Die Nametag-Einstellung bleibt nach Logout und Serverneustart erhalten.
 - [x] `/cc glowing enable` hebt aktuelle und zukünftige Challenge-Mobs durch
       Wände sichtbar hervor.
-- [ ] `/cc glowing disable` entfernt den Leuchteffekt wieder.
-- [ ] Die Glowing-Einstellung bleibt nach Logout und Serverneustart erhalten.
+- [x] `/cc glowing disable` entfernt den Leuchteffekt wieder.
+- [x] Die Glowing-Einstellung bleibt nach Logout und Serverneustart erhalten.
 - [ ] Nach einem Rundensieg tragen verbleibende Split-/Transformationsmobs keinen
       Glowing-Effekt mehr.
 - [x] Kleine Slime-/Magmawürfel verlieren nach dem Tod des Challenge-Elternmobs
