@@ -859,6 +859,7 @@ public final class ChallengeService implements Listener {
                 mob = recoverMob(round);
                 if (mob == null) continue;
             }
+            rescueFromNetherRoof(round, mob);
             rescueFromBlocks(round, mob);
             if (!round.chunk.contains(mob.getLocation())) {
                 mob.teleport(clampToChunk(mob.getLocation(), round.chunk));
@@ -971,7 +972,8 @@ public final class ChallengeService implements Listener {
         for (int attempt = 0; attempt < 96; attempt++) {
             int x = key.x() * 16 + random.nextInt(1, 15);
             int z = key.z() * 16 + random.nextInt(1, 15);
-            int y = surfaceY(world, x, z);
+            Integer y = surfaceY(world, x, z, anchor.getY());
+            if (y == null) continue;
             double distance = Math.hypot(x + .5 - anchor.getX(), z + .5 - anchor.getZ());
             if (distance >= 4 && distance <= 10 && safeSurface(world, x, y, z)) {
                 return new Location(world, x + .5, y, z + .5);
@@ -982,7 +984,8 @@ public final class ChallengeService implements Listener {
         double bestDistance = Double.MAX_VALUE;
         for (int x = key.x() * 16 + 1; x <= key.x() * 16 + 14; x++) {
             for (int z = key.z() * 16 + 1; z <= key.z() * 16 + 14; z++) {
-                int y = surfaceY(world, x, z);
+                Integer y = surfaceY(world, x, z, anchor.getY());
+                if (y == null) continue;
                 if (!safeSurface(world, x, y, z)) continue;
                 double distance = Math.abs(7.0 - Math.hypot(x + .5 - anchor.getX(), z + .5 - anchor.getZ()));
                 if (distance < bestDistance) {
@@ -998,9 +1001,23 @@ public final class ChallengeService implements Listener {
                 Math.max(key.z() * 16 + 1.5, Math.min(key.z() * 16 + 14.5, anchor.getZ())));
     }
 
-    private static int surfaceY(World world, int x, int z) {
-        return Math.min(world.getMaxHeight() - 3,
-                world.getHighestBlockYAt(x, z, HeightMap.MOTION_BLOCKING_NO_LEAVES) + 1);
+    private static Integer surfaceY(World world, int x, int z, double anchorY) {
+        int minimum = world.getMinHeight() + 1;
+        int maximum = world.getMaxHeight() - 2;
+        int origin = Math.max(minimum, Math.min(maximum, (int) Math.floor(anchorY)));
+        int range = Math.max(origin - minimum, maximum - origin);
+
+        // In the Nether the heightmap points at the upper bedrock roof. Search
+        // outwards from the participant instead so a portal below the roof keeps
+        // challenge mobs on the accessible cavern floor.
+        for (int offset = 0; offset <= range; offset++) {
+            int below = origin - offset;
+            if (below >= minimum && safeSurface(world, x, below, z)) return below;
+
+            int above = origin + offset;
+            if (offset > 0 && above <= maximum && safeSurface(world, x, above, z)) return above;
+        }
+        return null;
     }
 
     private static boolean safeSurface(World world, int x, int y, int z) {
@@ -1121,6 +1138,31 @@ public final class ChallengeService implements Listener {
         }
         plugin.getLogger().warning("Challenge-Mob " + mob.getType().getKey()
                 + " konnte nicht aus kollidierenden Blöcken befreit werden.");
+    }
+
+    private void rescueFromNetherRoof(RoundState round, Mob mob) {
+        if (mob.getWorld().getEnvironment() != World.Environment.NETHER
+                || mob.getLocation().getBlockY() < 128
+                || mob.getLocation().clone().subtract(0, 1, 0).getBlock().getType() != Material.BEDROCK) {
+            return;
+        }
+
+        Player anchor = round.participants.stream()
+                .map(Bukkit::getPlayer)
+                .filter(player -> player != null && player.isOnline() && player.getWorld().equals(mob.getWorld()))
+                .filter(player -> player.getY() < mob.getY() - 16.0)
+                .min(Comparator.comparingDouble(player -> player.getLocation().distanceSquared(mob.getLocation())))
+                .orElse(null);
+        if (anchor == null) return;
+
+        Location destination = findSpawn(mob.getWorld(), round.chunk, anchor.getLocation(), mob.getType());
+        if (destination.getY() >= mob.getY() - 8.0 || mob.collidesAt(destination)) return;
+
+        mob.getPathfinder().stopPathfinding();
+        mob.teleport(destination);
+        mob.setVelocity(new Vector());
+        plugin.getLogger().info("Challenge-Mob " + mob.getType().getKey()
+                + " von der unerreichbaren Nether-Decke zurück in den Spielbereich versetzt.");
     }
 
     private void addTicket(ChunkKey key) {

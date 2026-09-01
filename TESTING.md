@@ -98,11 +98,16 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 
 - [x] Ein direkter Spieler-Kill beendet die Runde.
 - [x] Eine andere tatsächliche Todesursache beendet die Runde ebenfalls:
-      Zombie Horse durch Sonnenbrand bestätigt; weitere Ursachen bleiben optional.
+      Zombie Horse durch Sonnenbrand und Hoglin durch Piglin bestätigt; weitere
+      Ursachen bleiben optional.
 - [x] Ein Challenge-Creeper beendet seine Runde durch die eigene Explosion und
       wird vom Recovery-Wächter nicht erneut erzeugt.
 - [x] Ein Wasser-Mob darf an Land erscheinen und sein Ersticken zählt (Nautilus
       bestätigt).
+- [ ] Bei einer normalen Entity-Transformation wird die Challenge-Markierung auf
+      den neuen Mob übertragen; es entsteht weder ein Sieg noch eine zweite Runde.
+      Erster Heilungsversuch nicht wertbar: `playmonkeei` starb vor Beginn der
+      Transformation am Zombie Villager.
 - [ ] Enderman, Ghast und Phantom bleiben trotz Teleport-/Flug-KI im Chunk.
       **Enderman bestätigt; Ghast/Phantom noch offen.**
 - [ ] Giant und Illusioner können aus `mobs.yml` geladen und gespawnt werden.
@@ -111,6 +116,11 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
       Challenge-Mobs erscheinen.
 - [x] Normale Mobs erscheinen auf einer sicheren Bodenfläche, nicht auf Blättern,
       Baumstämmen oder zufällig in einer Höhle.
+- [x] Im Nether erscheinen neue Challenge-Mobs auf einer vom Spieler erreichbaren
+      Bodenfläche nahe seiner Höhe und nicht auf der oberen Bedrock-Decke.
+- [x] Ein bereits auf der Nether-Decke gespeicherter Challenge-Mob wird vom
+      Recovery-Wächter zurück in den Spielbereich versetzt (Hoglin von `Y=128`
+      auf `Y=63`).
 - [ ] Große Mobs wie Ghasts werden nicht zwischen Bäumen oder in anderen zu engen
       Blockräumen gespawnt; geraten sie später hinein, werden sie befreit.
 - [x] Ein Challenge-Enderdragon erscheint oberhalb des höchsten Geländes im Chunk
@@ -146,10 +156,11 @@ erst für die nächste Runde.
 Erwartungen:
 
 - [x] Spieler erscheint in derselben Welt an derselben XYZ-Position.
-- [ ] Blickrichtung entspricht dem gespeicherten Wert.
+- [x] Blickrichtung entspricht dem gespeicherten Wert.
 - [x] Derselbe Chunk ist wieder gesperrt.
 - [x] Derselbe EntityType mit denselben HP ist vorhanden.
-- [ ] Ausrüstung und Variante des Mobs sind erhalten.
+- [x] Die Mob-Variante ist erhalten (Zombie Villager: Plains, Shepherd, Level 1).
+- [x] Vorhandene Mob-Ausrüstung ist erhalten.
 - [x] Bossbar und Border sind wieder sichtbar.
 - [x] Statistiken entsprechen nach Logout und Serverneustart dem gespeicherten State.
 - [x] Die Offline-Zeit wurde nicht zur Challenge-Spielzeit addiert.
