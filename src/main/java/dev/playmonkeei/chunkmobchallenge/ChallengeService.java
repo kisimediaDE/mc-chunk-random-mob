@@ -322,23 +322,50 @@ public final class ChallengeService implements Listener {
         double maxX = round.chunk.x() * 16.0 + 16.0 - margin;
         double minZ = round.chunk.z() * 16.0 + margin;
         double maxZ = round.chunk.z() * 16.0 + 16.0 - margin;
-        if (event.getTo().getX() < minX || event.getTo().getX() > maxX
-                || event.getTo().getZ() < minZ || event.getTo().getZ() > maxZ) {
+        boolean outsideX = event.getTo().getX() < minX || event.getTo().getX() > maxX;
+        boolean outsideZ = event.getTo().getZ() < minZ || event.getTo().getZ() > maxZ;
+        if (outsideX || outsideZ) {
             Location redirected = clampInsideChunk(event.getTo(), round.chunk, margin);
             Vector velocity = movingMob.getVelocity().clone();
-            if (event.getTo().getX() < minX || event.getTo().getX() > maxX) {
+            double rebound = Math.min(1.25, Math.max(0.1, Math.min(maxX - minX, maxZ - minZ) / 4.0));
+            if (outsideX) {
                 velocity.setX(inwardSpeed(velocity.getX(), round.chunk.centerX() - redirected.getX()));
+                redirected.setX(event.getTo().getX() < minX ? minX + rebound : maxX - rebound);
             }
-            if (event.getTo().getZ() < minZ || event.getTo().getZ() > maxZ) {
+            if (outsideZ) {
                 velocity.setZ(inwardSpeed(velocity.getZ(), round.chunk.centerZ() - redirected.getZ()));
+                redirected.setZ(event.getTo().getZ() < minZ ? minZ + rebound : maxZ - rebound);
             }
-            movingMob.getPathfinder().stopPathfinding();
+            if (isFlyingBoundaryMob(movingMob)) {
+                retargetFlyingMob(round, movingMob);
+            } else {
+                movingMob.getPathfinder().stopPathfinding();
+            }
             if (movingMob.collidesAt(redirected)) {
                 redirected = event.getFrom().clone();
                 velocity = new Vector();
             }
             movingMob.setVelocity(velocity);
             event.setTo(redirected);
+        }
+    }
+
+    private static boolean isFlyingBoundaryMob(Mob mob) {
+        return mob.getType() == EntityType.PHANTOM
+                || mob.getType() == EntityType.GHAST
+                || mob.getType() == EntityType.ENDER_DRAGON;
+    }
+
+    private static void retargetFlyingMob(RoundState round, Mob mob) {
+        Player target = round.participants.stream()
+                .map(Bukkit::getPlayer)
+                .filter(player -> player != null && player.isOnline() && !player.isDead()
+                        && player.getWorld().equals(mob.getWorld()))
+                .min(Comparator.comparingDouble(player -> player.getLocation().distanceSquared(mob.getLocation())))
+                .orElse(null);
+        if (target != null) {
+            mob.setTarget(target);
+            mob.lookAt(target);
         }
     }
 
@@ -489,7 +516,12 @@ public final class ChallengeService implements Listener {
             try {
             Entity entity = world.spawnEntity(spawn, type);
             if (entity instanceof Mob spawned) {
-                if (spawned.collidesAt(spawn)) {
+                Location boundedSpawn = clampInsideChunk(spawn, key, movementMargin(spawned));
+                Location usableSpawn = requiresMovementClearance(spawned)
+                        ? findMovementClearance(spawned, key, boundedSpawn)
+                        : boundedSpawn;
+                if (usableSpawn == null || spawned.collidesAt(usableSpawn)
+                        || !spawned.teleport(usableSpawn)) {
                     spawned.remove();
                     continue;
                 }
@@ -861,6 +893,7 @@ public final class ChallengeService implements Listener {
             }
             rescueFromNetherRoof(round, mob);
             rescueFromBlocks(round, mob);
+            rescueFromTightSpace(round, mob);
             if (!round.chunk.contains(mob.getLocation())) {
                 mob.teleport(clampToChunk(mob.getLocation(), round.chunk));
                 mob.setVelocity(new Vector());
@@ -1138,6 +1171,42 @@ public final class ChallengeService implements Listener {
         }
         plugin.getLogger().warning("Challenge-Mob " + mob.getType().getKey()
                 + " konnte nicht aus kollidierenden Blöcken befreit werden.");
+    }
+
+    private static boolean requiresMovementClearance(Mob mob) {
+        return Math.max(mob.getBoundingBox().getWidthX(), mob.getBoundingBox().getWidthZ()) >= 2.0;
+    }
+
+    private Location findMovementClearance(Mob mob, ChunkKey key, Location base) {
+        Location bounded = clampInsideChunk(base, key, movementMargin(mob));
+        int maxRise = Math.min(24, mob.getWorld().getMaxHeight() - 2 - bounded.getBlockY());
+        for (int rise = 0; rise <= maxRise; rise++) {
+            Location candidate = bounded.clone().add(0, rise, 0);
+            if (hasMovementClearance(mob, candidate)) return candidate;
+        }
+        return null;
+    }
+
+    private static boolean hasMovementClearance(Mob mob, Location location) {
+        if (mob.collidesAt(location)) return false;
+        double step = Math.min(3.0,
+                Math.max(1.5, Math.max(mob.getBoundingBox().getWidthX(), mob.getBoundingBox().getWidthZ()) / 2.0 + 0.75));
+        return !mob.collidesAt(location.clone().add(step, 0, 0))
+                && !mob.collidesAt(location.clone().add(-step, 0, 0))
+                && !mob.collidesAt(location.clone().add(0, 0, step))
+                && !mob.collidesAt(location.clone().add(0, 0, -step))
+                && !mob.collidesAt(location.clone().add(0, 1.5, 0));
+    }
+
+    private void rescueFromTightSpace(RoundState round, Mob mob) {
+        if (!requiresMovementClearance(mob) || hasMovementClearance(mob, mob.getLocation())) return;
+        Location destination = findMovementClearance(mob, round.chunk, mob.getLocation());
+        if (destination == null || destination.distanceSquared(mob.getLocation()) < 0.01) return;
+        mob.getPathfinder().stopPathfinding();
+        mob.teleport(destination);
+        mob.setVelocity(new Vector());
+        plugin.getLogger().info("Challenge-Mob " + mob.getType().getKey()
+                + " aus zu engem Blockraum in freien Bewegungsraum versetzt.");
     }
 
     private void rescueFromNetherRoof(RoundState round, Mob mob) {

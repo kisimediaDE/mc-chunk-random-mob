@@ -76,8 +76,8 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [x] Bei normalen Mobs erscheint eine Bossbar und folgt den Lebenspunkten.
 - [x] Ein Challenge-Enderdragon zeigt genau eine Bossbar, auch wenn Paper nach
       Logout oder Serverneustart keine native Bossbar mehr bereitstellt.
-- [ ] Ein Challenge-Wither zeigt genau eine Bossbar, auch nach Logout und
-      Serverneustart.
+- [x] Ein Challenge-Wither zeigt genau eine Vanilla-Bossbar, auch nach Logout und
+      Serverneustart; UUID, Runde und Angriffszustand bleiben erhalten.
 - [x] Die Border umfasst exakt den aktuellen 16×16-Chunk.
 - [x] Bauen nach oben und Graben nach unten bleibt möglich.
 - [x] Die Chunkgrenze kann zu Fuß und sprintend nicht überschritten werden.
@@ -85,7 +85,10 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [x] Enderperle und Chorus Fruit können den aktiven Chunk nicht verlassen.
 - [x] `/tp` aus dem aktiven Chunk wird blockiert. Die Vanilla-Erfolgsmeldung kann
       erscheinen, die gemessene Spielerposition bleibt jedoch im Challenge-Chunk.
-- [ ] Natürlich gespawnte Mobs können die Chunkgrenze frei überqueren.
+- [x] Natürlich gespawnte beziehungsweise unmarkierte Mobs können die Chunkgrenze
+      frei überqueren (Zombified Piglin bis `X=-0.783`).
+- [x] Der Tod eines unmarkierten normalen Mobs löst keinen Rundensieg aus und
+      verändert die aktive Challenge-Runde nicht.
 - [x] Der Challenge-Mob kann den Chunk nicht verlassen.
 - [x] An der Chunkkante bleibt der Challenge-Mob beweglich und wird nach innen
       zurückgelenkt, statt festzustecken.
@@ -108,12 +111,15 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
       den neuen Mob übertragen; es entsteht weder ein Sieg noch eine zweite Runde.
 - [x] Bei der Transformation werden Bossbar und sichtbarer Nametag auf den neuen
       EntityType aktualisiert (nach Neustart überall `Villager`).
-- [ ] Enderman, Ghast und Phantom bleiben trotz Teleport-/Flug-KI im Chunk.
-      **Enderman bestätigt; Ghast/Phantom noch offen.**
-- [ ] Giant und Illusioner können aus `mobs.yml` geladen und gespawnt werden.
+- [x] Enderman, Ghast und Phantom bleiben trotz Teleport-/Flug-KI im Chunk.
+      Das Phantom flog mit derselben UUID bis nahe an die nordöstliche Kante und
+      anschließend wieder nach innen, blieb beweglich und griff weiter an.
+- [x] Giant und Illusioner können aus `mobs.yml` geladen und gespawnt werden;
+      Bossbar, Markierung und jeweiliges Vanilla-Verhalten bleiben funktionsfähig.
+      Der Illusioner setzte auf `hard` zusätzlich korrekt Blindheit ein.
 - [x] Ein zufälliger Enderdragon kann als Challenge-Mob gespawnt werden.
-- [ ] Wither und Warden können als gleich gewichtete
-      Challenge-Mobs erscheinen.
+- [x] Wither und Warden können als gleich gewichtete Challenge-Mobs erscheinen,
+      greifen normal an und bleiben innerhalb ihrer Chunkgrenze.
 - [x] Normale Mobs erscheinen auf einer sicheren Bodenfläche, nicht auf Blättern,
       Baumstämmen oder zufällig in einer Höhle.
 - [x] Im Nether erscheinen neue Challenge-Mobs auf einer vom Spieler erreichbaren
@@ -121,8 +127,10 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [x] Ein bereits auf der Nether-Decke gespeicherter Challenge-Mob wird vom
       Recovery-Wächter zurück in den Spielbereich versetzt (Hoglin von `Y=128`
       auf `Y=63`).
-- [ ] Große Mobs wie Ghasts werden nicht zwischen Bäumen oder in anderen zu engen
-      Blockräumen gespawnt; geraten sie später hinein, werden sie befreit.
+- [x] Große Mobs wie Ghasts werden nicht zwischen Bäumen oder in anderen zu engen
+      Blockräumen gespawnt; geraten sie später hinein, werden sie befreit. Nach
+      dem Fix bewegte sich dieselbe Ghast-UUID innerhalb von 27 Sekunden frei von
+      `[1314.34, 77.54, 2429.18]` nach `[1314.77, 80.90, 2428.94]`.
 - [x] Ein Challenge-Enderdragon erscheint oberhalb des höchsten Geländes im Chunk
       und wird nicht unter die Oberfläche gedrückt.
 - [x] Ein Challenge-Enderdragon außerhalb eines Vanilla-DragonBattle wählt einen
@@ -235,11 +243,11 @@ Danach `hardcore=false` zurücksetzen.
 
 - [x] Einen Mob aus `mobs.yml` entfernen und `/cc reload` ausführen: Er wird in
       zukünftigen Runden nicht mehr gewählt.
-- [ ] Unbekannten Key eintragen: Konsolenwarnung, aber kein Plugin-Absturz.
-- [ ] Doppelten Key eintragen: Konsolenwarnung, nur einmal im Pool.
-- [ ] Nur ungültige Einträge eintragen: Reload wird abgelehnt und der vorherige
+- [x] Unbekannten Key eintragen: Konsolenwarnung, aber kein Plugin-Absturz.
+- [x] Doppelten Key eintragen: Konsolenwarnung, nur einmal im Pool.
+- [x] Nur ungültige Einträge eintragen: Reload wird abgelehnt und der vorherige
       Pool bleibt aktiv.
-- [ ] `mobs.yml` bei gestopptem Server löschen: Beim nächsten Start wird die
+- [x] `mobs.yml` bei gestopptem Server löschen: Beim nächsten Start wird die
       vollständige versionsabhängige Liste neu erzeugt.
 - [x] `/cc status` zeigt eigene Runde und globale Statistiken.
 - [x] `/cc tags disable` blendet aktuelle und zukünftige Mob-Nametags aus.
