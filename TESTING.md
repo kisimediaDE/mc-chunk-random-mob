@@ -308,6 +308,10 @@ Danach `hardcore=false` zurücksetzen.
       Pool bleibt aktiv.
 - [x] `mobs.yml` bei gestopptem Server löschen: Beim nächsten Start wird die
       vollständige versionsabhängige Liste neu erzeugt.
+      Nach den gezielten Cleanup-Tests wurde die normale Paper-26.1.2-Welt
+      wiederhergestellt; der Startlog bestätigt `Preparing level "world"`,
+      `Neue mobs.yml mit 89 EntityTypes erzeugt` und
+      `Mob-Pool geladen: 89 EntityTypes`.
 - [x] `/cc status` zeigt eigene Runde und globale Statistiken.
 - [x] `/cc tags disable` blendet aktuelle und zukünftige Mob-Nametags aus.
 - [x] `/cc tags enable` blendet die Nametags wieder ein.
