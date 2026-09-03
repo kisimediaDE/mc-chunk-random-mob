@@ -22,8 +22,8 @@ Letzte Aktualisierung: **3. September 2026**
 - Gegenkompiliert: **Paper API 26.2 Build 121**
 - `[x]` bedeutet praktisch bestätigt; `[ ]` bleibt offen oder muss auf der
   zweiten Serverversion erneut geprüft werden.
-- Wichtigster noch offener Block: Koop. Beim Hardcore-Test ist nur noch die
-  Entmarkierung eines nach der Niederlage weiterlebenden Challenge-Mobs offen.
+- Einziger noch offener Funktionsblock: Koop beziehungsweise Verhalten mit zwei
+  gleichzeitig verbundenen Spielern.
 - Der vollständige Solo-Run auf Paper 26.2 wurde nach **02:43:39 aktiver
   Spielzeit** mit **42 Mobs**, **56 Runden** und **15 Toden** durch den echten
   Vanilla-Enderdragon abgeschlossen.
@@ -229,15 +229,29 @@ separaten Welt `world-hardcore` und Schwierigkeit `hard` durchgeführt.
 - [x] Der Tod von `playmonkeei` beendet den gesamten Run unmittelbar mit
       `RUN GESCHEITERT`; Spielzeit `00:00:34`, 0 Mobs, 1 Runde und 1 Tod.
 - [x] Worldborder und Bossbar werden nach der Hardcore-Niederlage entfernt.
-- [ ] Übrige Challenge-Mobs verlieren Markierung und künstliche Persistenz, bleiben
-      aber als normale Mobs bestehen.
+- [x] Ein überlebender Challenge-Mob wird normalisiert und bleibt bestehen: Die
+      Cow mit derselben UUID lebt nach der Hardcore-Niederlage weiter,
+      `BukkitValues` und `CustomName` fehlen, `PersistenceRequired` ist `0b` und
+      Glowing ist nicht mehr aktiv.
 - [x] `/cc status` zeigt `FAILED`, Spielzeit `00:00:34`, 0 Mobs, 1 Runde,
       1 Tod und 0 aktive/pausierte Chunk-Runden.
 
 Der Pufferfish war bei den anschließenden Abfragen nach `BukkitValues` und
-`PersistenceRequired` nicht mehr im Umkreis vorhanden. Die Entmarkierung eines
-noch lebenden Challenge-Mobs war deshalb in diesem Durchlauf nicht sichtbar
-prüfbar und bleibt offen.
+`PersistenceRequired` nicht mehr im Umkreis vorhanden. Ein erster gezielter
+Cow-Nachtest wurde versehentlich in der bereits
+wieder aktivierten normalen Welt gestartet und ist für den Hardcore-Punkt nicht
+wertbar. Sein Ausgangsstatus war `RUNNING`, 0 Mobs, 1 Runde, 0 Tode. Die Kuh
+besitzt dort UUID
+`1165974014/-1984936792/-2115810426/578803494`, beide Challenge-PDC-IDs,
+`PersistenceRequired: 1b` und `Glowing: 1b`.
+
+Der gültige Cow-Nachtest läuft nach einem bestätigten Start von
+`world-hardcore`: `RUNNING`, Cow-Runde im Chunk `-1/-1`, Nametags und Glowing
+aktiviert. Referenz-UUID der Kuh:
+`-1708053565/2058436661/-1541867906/1894832394`.
+Nach der Niederlage meldete `/cc status` `FAILED`; dieselbe Cow-UUID blieb
+vorhanden, während Challenge-PDC und CustomName fehlten,
+`PersistenceRequired: 0b` war und kein aktiver Glowing-Wert mehr vorlag.
 
 Danach `hardcore=false` zurücksetzen.
 
@@ -302,8 +316,19 @@ Danach `hardcore=false` zurücksetzen.
       Wände sichtbar hervor.
 - [x] `/cc glowing disable` entfernt den Leuchteffekt wieder.
 - [x] Die Glowing-Einstellung bleibt nach Logout und Serverneustart erhalten.
-- [ ] Nach einem Rundensieg tragen verbleibende Split-/Transformationsmobs keinen
+- [x] Nach einem Rundensieg tragen verbleibende Split-/Transformationsmobs keinen
       Glowing-Effekt mehr.
+      Gezielter Nachtest auf Paper 26.1.2 gestartet: Magma-Cube-Runde im Chunk
+      `-8/-6`, Nametags und Glowing aktiviert. Der Elternmob wurde kontrolliert
+      auf `Size: 3` gesetzt und besitzt UUID
+      `97312321/78006272/-1803271013/-1447317515`, `Glowing: 1b` sowie beide
+      Challenge-PDC-IDs. Nach seinem Tod entstanden vier Magma Cubes; die drei
+      Split-Nachkommen hatten keine PDC-, CustomName- oder Glowing-Ausgabe und
+      `PersistenceRequired: 0b`. Der einzelne markierte Würfel gehörte nach einem
+      Chunkwechsel bereits zur neuen Runde 2 und trug eine andere Round-ID
+      (`e80e14a4-...` statt `8ed2cb60-...`). Visuell waren an den Split-Würfeln
+      weder Nametag noch Glowing vorhanden; Border und Bossbar verschwanden und
+      es erschien genau eine Siegesmeldung.
 - [x] Kleine Slime-/Magmawürfel verlieren nach dem Tod des Challenge-Elternmobs
       Nametag, PDC-Markierung und künstliche Persistenz.
 - [x] Bereits gespeicherte Legacy-Namen wie `Challenge: Magma Cube` werden beim
