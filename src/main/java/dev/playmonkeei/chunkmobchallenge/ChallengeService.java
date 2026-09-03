@@ -390,9 +390,9 @@ public final class ChallengeService implements Listener {
         Entity transformed = event.getTransformedEntities().getFirst();
         if (!(transformed instanceof Mob mob)) return;
         Bukkit.getScheduler().runTask(plugin, () -> {
-            tagMob(mob, round);
             round.mobUuid = mob.getUniqueId();
             round.entityTypeKey = mob.getType().getKey().toString();
+            tagMob(mob, round);
             captureSnapshot(round, mob);
             checkpoint();
         });

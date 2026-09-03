@@ -79,7 +79,7 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [ ] Ein Challenge-Wither zeigt genau eine Bossbar, auch nach Logout und
       Serverneustart.
 - [x] Die Border umfasst exakt den aktuellen 16×16-Chunk.
-- [ ] Bauen nach oben und Graben nach unten bleibt möglich.
+- [x] Bauen nach oben und Graben nach unten bleibt möglich.
 - [x] Die Chunkgrenze kann zu Fuß und sprintend nicht überschritten werden.
 - [x] Die Chunkgrenze kann mit Elytra nicht überschritten werden.
 - [x] Enderperle und Chorus Fruit können den aktiven Chunk nicht verlassen.
@@ -104,10 +104,10 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
       wird vom Recovery-Wächter nicht erneut erzeugt.
 - [x] Ein Wasser-Mob darf an Land erscheinen und sein Ersticken zählt (Nautilus
       bestätigt).
-- [ ] Bei einer normalen Entity-Transformation wird die Challenge-Markierung auf
+- [x] Bei einer normalen Entity-Transformation wird die Challenge-Markierung auf
       den neuen Mob übertragen; es entsteht weder ein Sieg noch eine zweite Runde.
-      Erster Heilungsversuch nicht wertbar: `playmonkeei` starb vor Beginn der
-      Transformation am Zombie Villager.
+- [x] Bei der Transformation werden Bossbar und sichtbarer Nametag auf den neuen
+      EntityType aktualisiert (nach Neustart überall `Villager`).
 - [ ] Enderman, Ghast und Phantom bleiben trotz Teleport-/Flug-KI im Chunk.
       **Enderman bestätigt; Ghast/Phantom noch offen.**
 - [ ] Giant und Illusioner können aus `mobs.yml` geladen und gespawnt werden.
