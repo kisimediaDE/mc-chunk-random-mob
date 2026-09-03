@@ -6,15 +6,17 @@ werden.
 
 ## Aktueller Teststand
 
-Letzte Aktualisierung: **1. September 2026**
+Letzte Aktualisierung: **3. September 2026**
 
 - Manuell getestet: **Paper 26.2 Build 121**, Solo mit `playmonkeei`
 - Automatisch gebaut/getestet: **Paper API 26.1.2 Build 74**
 - Gegenkompiliert: **Paper API 26.2 Build 121**
 - `[x]` bedeutet praktisch bestätigt; `[ ]` bleibt offen oder muss auf der
   zweiten Serverversion erneut geprüft werden.
-- Wichtigste noch offene Blöcke: Paper-26.1.2-Livetest, Koop, Hardcore,
-  Portale/Dimensionen und echter Vanilla-Enderdrachen-Sieg.
+- Wichtigste noch offene Blöcke: Paper-26.1.2-Livetest, Koop und Hardcore.
+- Der vollständige Solo-Run auf Paper 26.2 wurde nach **02:43:39 aktiver
+  Spielzeit** mit **42 Mobs**, **56 Runden** und **15 Toden** durch den echten
+  Vanilla-Enderdragon abgeschlossen.
 
 ## 1. Testserver vorbereiten
 
@@ -231,19 +233,24 @@ Danach `hardcore=false` zurücksetzen.
 - [x] Nach dem Mob-Tod funktioniert das Netherportal.
 - [x] Im Nether-Zielchunk startet sofort eine neue Runde.
 - [x] Rückkehr in die Overworld startet am Ziel ebenfalls eine Runde.
-- [ ] Dasselbe Verhalten gilt für das Endportal.
+- [x] Ein Endportal kann während einer aktiven Runde nicht benutzt werden.
+- [x] Nach dem Mob-Tod funktioniert dasselbe Endportal und startet im End eine
+      neue Runde.
 - [x] Overworld- und Nether-Chunks mit denselben X/Z-Koordinaten werden als
       unterschiedliche Runden behandelt; das End bleibt noch offen.
 
 ## 10. Enderdragon und Sieg
 
-- [ ] Der normale DragonBattle-Enderdragon im End bleibt vorhanden.
+- [x] Der normale DragonBattle-Enderdragon im End bleibt vorhanden; Paper meldete
+      beim ersten Eintritt ausdrücklich, dass er noch nicht getötet wurde.
 - [x] Ein zufälliger Challenge-Enderdragon kann getötet werden, ohne den Run zu
       beenden.
-- [ ] Nur der Tod des vom Vanilla-DragonBattle verwalteten Enderdragons erzeugt
+- [x] Nur der Tod des vom Vanilla-DragonBattle verwalteten Enderdragons erzeugt
       `CHALLENGE GESCHAFFT!`.
-- [ ] Abschlussmeldung zeigt Spielzeit, Mobs, Runden und Tode.
-- [ ] Borders und Bossbars werden nach dem Sieg entfernt.
+- [x] Abschlussmeldung zeigt Spielzeit, Mobs, Runden und Tode (bestätigt mit
+      `02:43:39`, 42 Mobs, 56 Runden und 15 Toden).
+- [x] Borders und Bossbars werden nach dem Sieg entfernt; weitere Chunkwechsel
+      starten bei Status `COMPLETED` keine neue Runde.
 
 ## 11. Konfiguration und Commands
 
@@ -269,7 +276,7 @@ Danach `hardcore=false` zurücksetzen.
       Nametag, PDC-Markierung und künstliche Persistenz.
 - [x] Bereits gespeicherte Legacy-Namen wie `Challenge: Magma Cube` werden beim
       Laden ihres Chunks entfernt.
-- [ ] Drachenfeuerbälle einer Runde werden bei Sieg, Todauflösung oder `/cc stop`
+- [x] Drachenfeuerbälle einer Runde werden bei Sieg, Todauflösung oder `/cc stop`
       entfernt und können danach keinen Spieler mehr treffen.
 - [x] `/cc stop` entfernt State, Border, Bossbar und Markierungen.
 - [x] Nach `/cc stop` bleiben noch lebende Challenge-Entities als normale Mobs.
