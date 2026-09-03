@@ -9,11 +9,21 @@ werden.
 Letzte Aktualisierung: **3. September 2026**
 
 - Manuell getestet: **Paper 26.2 Build 121**, Solo mit `playmonkeei`
+- Paper **26.1.2 Build 74**: Server- und Pluginstart mit 89 zur Laufzeit
+  erkannten EntityTypes bestätigt; Start-Smoke-Test mit Hoglin, Bossbar,
+  Chunkborder und standardmäßig deaktivierten Nametags/Glowing bestanden. Ein
+  Command-Teleport aus dem Chunk wurde serverseitig blockiert; die natürliche
+  Hoglin-zu-Zoglin-Transformation übertrug die aktive Runde korrekt. Nach einem
+  Serverneustart waren Spielerposition, Blickrichtung, Zoglin-UUID und 38 HP
+  exakt erhalten; Offline-Zeit wurde nicht mitgezählt. Zoglin-Sieg und atomarer
+  Start einer zweiten Runde wurden ebenfalls live bestätigt. Auch eine
+  Creeper-Selbstexplosion beendete exakt einmal die Runde ohne Recovery.
 - Automatisch gebaut/getestet: **Paper API 26.1.2 Build 74**
 - Gegenkompiliert: **Paper API 26.2 Build 121**
 - `[x]` bedeutet praktisch bestätigt; `[ ]` bleibt offen oder muss auf der
   zweiten Serverversion erneut geprüft werden.
-- Wichtigste noch offene Blöcke: Paper-26.1.2-Livetest, Koop und Hardcore.
+- Wichtigster noch offener Block: Koop. Beim Hardcore-Test ist nur noch die
+  Entmarkierung eines nach der Niederlage weiterlebenden Challenge-Mobs offen.
 - Der vollständige Solo-Run auf Paper 26.2 wurde nach **02:43:39 aktiver
   Spielzeit** mit **42 Mobs**, **56 Runden** und **15 Toden** durch den echten
   Vanilla-Enderdragon abgeschlossen.
@@ -65,11 +75,13 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 
 - [x] Server startet ohne Plugin-Stacktrace.
 - [x] Im Log steht `ChunkMobChallenge ist bereit.`.
-- [ ] `/plugins` zeigt `ChunkMobChallenge` grün an.
+- [x] `/plugins` zeigt `ChunkMobChallenge` grün an (auf Paper 26.2 und 26.1.2
+      bestätigt).
 - [x] `plugins/ChunkMobChallenge/mobs.yml` wurde automatisch erzeugt.
 - [x] Die Datei enthält echte Mobs, unter anderem Cow, Zombie, Wither und
       Enderdragon, aber keine Items, Pfeile, Boote oder Displays.
-- [ ] `/cc status` meldet vor dem Start, dass keine Challenge vorhanden ist.
+- [x] `/cc status` meldet vor dem Start, dass keine Challenge vorhanden ist
+      (auf Paper 26.1.2 bestätigt).
 
 ## 3. Solo-Grundablauf
 
@@ -201,11 +213,31 @@ kurz weiterlaufen gelassen und erst danach mit `stop` beendet wird.
 Für diesen Test `hardcore=true` in der jeweiligen `server.properties` setzen und
 eine frische Testwelt verwenden.
 
-- [ ] Der Tod eines Teilnehmers beendet den gesamten Run.
-- [ ] Alle Borders und Bossbars werden entfernt.
+Hinweis zum Test auf Paper 26.1.2: Der erste Versuch mit der bereits vorhandenen
+Nicht-Hardcore-Welt war nicht wertbar. Obwohl `hardcore=true` in
+`server.properties` stand, blieb die laufende Welt eine Nicht-Hardcore-Welt und
+der Spieler konnte normal respawnen. Der gültige Test wird deshalb mit der neuen
+separaten Welt `world-hardcore` und Schwierigkeit `hard` durchgeführt.
+
+- [x] Paper 26.1.2 erzeugt für den gültigen Test eine neue Welt: Im Startlog stehen
+      `No existing world data, creating new world` und
+      `Preparing level "world-hardcore"`.
+- [x] Kontroll-Run startet in der frischen Welt regulär: Pufferfish-Runde,
+      `RUNNING`, Spielzeit `00:00:02`, 0 Mobs, 1 Runde und 0 Tode.
+- [x] Der Client zeigt in dieser Welt die Hardcore-Herzen.
+
+- [x] Der Tod von `playmonkeei` beendet den gesamten Run unmittelbar mit
+      `RUN GESCHEITERT`; Spielzeit `00:00:34`, 0 Mobs, 1 Runde und 1 Tod.
+- [x] Worldborder und Bossbar werden nach der Hardcore-Niederlage entfernt.
 - [ ] Übrige Challenge-Mobs verlieren Markierung und künstliche Persistenz, bleiben
       aber als normale Mobs bestehen.
-- [ ] `/cc status` zeigt den Run als `FAILED`.
+- [x] `/cc status` zeigt `FAILED`, Spielzeit `00:00:34`, 0 Mobs, 1 Runde,
+      1 Tod und 0 aktive/pausierte Chunk-Runden.
+
+Der Pufferfish war bei den anschließenden Abfragen nach `BukkitValues` und
+`PersistenceRequired` nicht mehr im Umkreis vorhanden. Die Entmarkierung eines
+noch lebenden Challenge-Mobs war deshalb in diesem Durchlauf nicht sichtbar
+prüfbar und bleibt offen.
 
 Danach `hardcore=false` zurücksetzen.
 
