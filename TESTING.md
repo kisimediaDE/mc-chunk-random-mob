@@ -136,9 +136,15 @@ Wichtig: Einen laufenden Persistenztest immer mit dem Server-Konsolenbefehl
 - [x] Ein Challenge-Enderdragon außerhalb eines Vanilla-DragonBattle wählt einen
       Teilnehmer als Ziel, reagiert auf Pfeil-/Nahkampfschaden und greift mit
       Drachenfeuerbällen an.
+- [x] Drachenfeuerbälle entstehen sichtbar unterhalb der Dragon-Hitbox, fliegen
+      bis zum Boden und erzeugen dort die Atemwolke; vorherige Wolken verschwinden
+      beim nächsten Schuss.
+- [x] Ein Challenge-Enderdragon bleibt in einem kontrollierten Hover über der
+      Chunkmitte, ist zuverlässig treffbar und wird beim Kampf nicht ständig von
+      der Border zurückteleportiert.
 - [x] Ein Challenge-Enderdragon ist auf halbe Größe skaliert und seine gesamte
       Hitbox bleibt innerhalb der Chunkgrenze.
-- [ ] Der Tod eines zufällig gespawnten Enderdragons beendet nicht den Run.
+- [x] Der Tod eines zufällig gespawnten Enderdragons beendet nicht den Run.
 
 Tipp für gezielte Tests: Vor dem Serverstart in `mobs.yml` vorübergehend nur den
 gewünschten Mob stehen lassen. Danach `/cc reload` verwenden. Die Änderung gilt
@@ -232,7 +238,7 @@ Danach `hardcore=false` zurücksetzen.
 ## 10. Enderdragon und Sieg
 
 - [ ] Der normale DragonBattle-Enderdragon im End bleibt vorhanden.
-- [ ] Ein zufälliger Challenge-Enderdragon kann getötet werden, ohne den Run zu
+- [x] Ein zufälliger Challenge-Enderdragon kann getötet werden, ohne den Run zu
       beenden.
 - [ ] Nur der Tod des vom Vanilla-DragonBattle verwalteten Enderdragons erzeugt
       `CHALLENGE GESCHAFFT!`.

@@ -42,6 +42,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.DragonBattle;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.DragonFireball;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -802,9 +803,11 @@ public final class ChallengeService implements Listener {
         String roundId = round.id.toString();
         for (World world : Bukkit.getWorlds()) {
             for (Entity entity : world.getEntities()) {
-                if (!(entity instanceof Projectile)) continue;
                 String taggedRound = entity.getPersistentDataContainer().get(roundTag, PersistentDataType.STRING);
-                if (roundId.equals(taggedRound)) entity.remove();
+                boolean taggedProjectile = entity instanceof Projectile && roundId.equals(taggedRound);
+                boolean ownedCloud = entity instanceof AreaEffectCloud cloud
+                        && round.mobUuid != null && round.mobUuid.equals(cloud.getOwnerUniqueId());
+                if (taggedProjectile || ownedCloud) entity.remove();
             }
         }
     }
@@ -1087,6 +1090,7 @@ public final class ChallengeService implements Listener {
 
     private void updateChallengeDragonAttack(RoundState round, Mob mob) {
         if (!(mob instanceof EnderDragon dragon) || dragon.getDragonBattle() != null) return;
+        stabilizeChallengeDragon(round, dragon);
         Player target = round.participants.stream()
                 .map(Bukkit::getPlayer)
                 .filter(player -> player != null && !player.isDead() && player.getWorld().equals(dragon.getWorld()))
@@ -1099,14 +1103,39 @@ public final class ChallengeService implements Listener {
         long nextAttack = dragonNextAttackAt.computeIfAbsent(round.id, ignored -> now + 2_000L);
         if (now < nextAttack) return;
 
-        Vector direction = target.getEyeLocation().toVector().subtract(dragon.getEyeLocation().toVector());
+        Location launchPoint = new Location(dragon.getWorld(), dragon.getX(),
+                dragon.getBoundingBox().getMinY() - 0.5, dragon.getZ());
+        Vector impactPoint = target.getLocation().toVector().subtract(new Vector(0, 0.25, 0));
+        Vector direction = impactPoint.subtract(launchPoint.toVector());
         if (direction.lengthSquared() > 0.0001) {
-            DragonFireball fireball = dragon.launchProjectile(DragonFireball.class,
-                    direction.normalize().multiply(1.1));
+            Vector aim = direction.normalize();
+            removeRoundProjectiles(round);
+            Entity spawnedProjectile = dragon.getWorld().spawnEntity(launchPoint, EntityType.DRAGON_FIREBALL);
+            if (!(spawnedProjectile instanceof DragonFireball fireball)) {
+                spawnedProjectile.remove();
+                return;
+            }
+            fireball.setShooter(dragon);
+            fireball.setAcceleration(aim.clone().multiply(0.04));
+            fireball.setVelocity(aim.clone().multiply(0.45));
             fireball.getPersistentDataContainer().set(roundTag, PersistentDataType.STRING, round.id.toString());
             fireball.getPersistentDataContainer().set(runTag, PersistentDataType.STRING, run.id.toString());
         }
         dragonNextAttackAt.put(round.id, now + 5_000L);
+    }
+
+    private static void stabilizeChallengeDragon(RoundState round, EnderDragon dragon) {
+        if (dragon.getPhase() != EnderDragon.Phase.HOVER) {
+            dragon.setPhase(EnderDragon.Phase.HOVER);
+        }
+        double hoverY = Math.min(dragon.getWorld().getMaxHeight() - 3,
+                highestTerrain(dragon.getWorld(), round.chunk) + 6.0);
+        Location hover = new Location(dragon.getWorld(), round.chunk.centerX(), hoverY, round.chunk.centerZ(),
+                dragon.getYaw(), dragon.getPitch());
+        if (dragon.getLocation().distanceSquared(hover) > 1.0) {
+            dragon.teleport(hover);
+        }
+        dragon.setVelocity(new Vector());
     }
 
     private static void provokeChallengeDragon(RoundState round, EnderDragon dragon, Player target) {
