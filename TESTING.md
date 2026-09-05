@@ -23,7 +23,8 @@ Letzte Aktualisierung: **5. September 2026**
 - `[x]` bedeutet praktisch bestätigt; `[ ]` bleibt offen oder muss auf der
   zweiten Serverversion erneut geprüft werden.
 - Alle vorgesehenen Solo-, Hardcore- und Koop-Funktionsblöcke wurden praktisch
-  bestätigt; es sind keine Checklistenpunkte mehr offen.
+  bestätigt. Der anschließend ergänzte Bossbar-Schalter benötigt noch den unten
+  beschriebenen kurzen Nachtest.
 - Der vollständige Solo-Run auf Paper 26.2 wurde nach **02:43:39 aktiver
   Spielzeit** mit **42 Mobs**, **56 Runden** und **15 Toden** durch den echten
   Vanilla-Enderdragon abgeschlossen.
@@ -365,6 +366,14 @@ das lokale Prism-Offlinekonto `testmonkeei` abgewiesen wird.
       Wände sichtbar hervor.
 - [x] `/cc glowing disable` entfernt den Leuchteffekt wieder.
 - [x] Die Glowing-Einstellung bleibt nach Logout und Serverneustart erhalten.
+- [ ] `/cc bossbar disable` blendet die aktuelle Mob-Bossbar aus, ohne Border,
+      Mob-KI oder Runde zu verändern; `/cc status` zeigt `Bossbar: AUS`.
+- [ ] `/cc bossbar enable` blendet dieselbe Bossbar wieder ein; `/cc status`
+      zeigt `Bossbar: AN`.
+- [ ] Die Bossbar-Einstellung bleibt nach Logout und Serverneustart erhalten und
+      gilt auch für neue Runden.
+- [ ] Wither und Challenge-Enderdragon verwenden bei deaktivierter Einstellung
+      ebenfalls keine sichtbare Vanilla-Bossbar.
 - [x] Nach einem Rundensieg tragen verbleibende Split-/Transformationsmobs keinen
       Glowing-Effekt mehr.
       Gezielter Nachtest auf Paper 26.1.2 gestartet: Magma-Cube-Runde im Chunk
