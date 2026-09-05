@@ -47,6 +47,7 @@ public final class StateStore {
             boolean hasVisibilitySettings = yaml.getInt("run.visibility-settings-version", 0) >= 1;
             run.nameTagsVisible = hasVisibilitySettings && yaml.getBoolean("run.name-tags-visible", false);
             run.glowing = hasVisibilitySettings && yaml.getBoolean("run.glowing", false);
+            run.bossBarsVisible = yaml.getBoolean("run.boss-bars-visible", true);
 
             ConfigurationSection rounds = yaml.getConfigurationSection("rounds");
             if (rounds != null) {
@@ -109,6 +110,7 @@ public final class StateStore {
         yaml.set("run.started-rounds", run.startedRounds);
         yaml.set("run.name-tags-visible", run.nameTagsVisible);
         yaml.set("run.glowing", run.glowing);
+        yaml.set("run.boss-bars-visible", run.bossBarsVisible);
         yaml.set("run.visibility-settings-version", 1);
 
         for (RoundState round : run.rounds.values()) {

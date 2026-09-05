@@ -13,7 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class ChallengeCommand implements CommandExecutor, TabCompleter {
-    private static final List<String> SUBCOMMANDS = List.of("start", "stop", "status", "reload", "tags", "glowing");
+    private static final List<String> SUBCOMMANDS = List.of(
+            "start", "stop", "status", "reload", "tags", "glowing", "bossbar");
     private static final List<String> TOGGLE_OPTIONS = List.of("enable", "disable");
     private final ChallengeService service;
 
@@ -34,7 +35,7 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(Component.text("Dafür fehlt dir die Berechtigung.", NamedTextColor.RED));
             return true;
         }
-        if (!sub.equals("tags") && !sub.equals("glowing") && args.length != 1) {
+        if (!sub.equals("tags") && !sub.equals("glowing") && !sub.equals("bossbar") && args.length != 1) {
             sendUsage(sender, label);
             return true;
         }
@@ -82,6 +83,20 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
                             NamedTextColor.GREEN));
                 }
             }
+            case "bossbar" -> {
+                if (args.length != 2 || !TOGGLE_OPTIONS.contains(args[1].toLowerCase(Locale.ROOT))) {
+                    sender.sendMessage(Component.text("Verwendung: /" + label + " bossbar <enable|disable>",
+                            NamedTextColor.YELLOW));
+                    return true;
+                }
+                boolean visible = args[1].equalsIgnoreCase("enable");
+                if (!service.setBossBarsVisible(visible)) {
+                    sender.sendMessage(Component.text("Es läuft keine Challenge.", NamedTextColor.GRAY));
+                } else {
+                    sender.sendMessage(Component.text("Mob-Bossbars sind jetzt "
+                                    + (visible ? "aktiviert." : "deaktiviert."), NamedTextColor.GREEN));
+                }
+            }
             default -> sender.sendMessage(Component.text("Unbekannter Unterbefehl.", NamedTextColor.RED));
         }
         return true;
@@ -94,7 +109,9 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
             String prefix = args[0].toLowerCase(Locale.ROOT);
             return SUBCOMMANDS.stream().filter(value -> value.startsWith(prefix)).toList();
         }
-        if (args.length == 2 && (args[0].equalsIgnoreCase("tags") || args[0].equalsIgnoreCase("glowing"))) {
+        if (args.length == 2 && (args[0].equalsIgnoreCase("tags")
+                || args[0].equalsIgnoreCase("glowing")
+                || args[0].equalsIgnoreCase("bossbar"))) {
             String prefix = args[1].toLowerCase(Locale.ROOT);
             return TOGGLE_OPTIONS.stream().filter(value -> value.startsWith(prefix)).toList();
         }
@@ -103,6 +120,7 @@ public final class ChallengeCommand implements CommandExecutor, TabCompleter {
 
     private static void sendUsage(CommandSender sender, String label) {
         sender.sendMessage(Component.text(
-                "Verwendung: /" + label + " <start|stop|status|reload|tags|glowing>", NamedTextColor.YELLOW));
+                "Verwendung: /" + label + " <start|stop|status|reload|tags|glowing|bossbar>",
+                NamedTextColor.YELLOW));
     }
 }

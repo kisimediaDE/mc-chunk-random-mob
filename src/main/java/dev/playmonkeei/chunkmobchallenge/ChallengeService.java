@@ -202,6 +202,21 @@ public final class ChallengeService implements Listener {
         return true;
     }
 
+    public boolean setBossBarsVisible(boolean visible) {
+        if (run == null || !run.running()) return false;
+        run.bossBarsVisible = visible;
+        for (RoundState round : run.rounds.values()) {
+            if (visible && round.phase == RoundPhase.ACTIVE && round.bossBar == null) {
+                Mob mob = mob(round);
+                if (mob != null) createBossBar(round, mob);
+            } else {
+                refreshRoundViewers(round);
+            }
+        }
+        checkpoint();
+        return true;
+    }
+
     public Component status(UUID requester) {
         if (run == null) return PREFIX.append(Component.text("Keine Challenge vorhanden.", NamedTextColor.GRAY));
         StringBuilder text = new StringBuilder();
@@ -211,7 +226,8 @@ public final class ChallengeService implements Listener {
                 .append(" | Runden: ").append(run.startedRounds)
                 .append(" | Tode: ").append(run.deaths)
                 .append(" | Nametags: ").append(run.nameTagsVisible ? "AN" : "AUS")
-                .append(" | Glowing: ").append(run.glowing ? "AN" : "AUS");
+                .append(" | Glowing: ").append(run.glowing ? "AN" : "AUS")
+                .append(" | Bossbar: ").append(run.bossBarsVisible ? "AN" : "AUS");
         PlayerState state = requester == null ? null : run.players.get(requester);
         if (state != null && state.roundChunk != null) {
             RoundState round = run.rounds.get(state.roundChunk);
@@ -636,7 +652,7 @@ public final class ChallengeService implements Listener {
                 round.participants.add(player.getUniqueId());
                 activate(round);
                 applyBorder(player, round.chunk);
-                if (round.bossBar != null) round.bossBar.addPlayer(player);
+                if (run.bossBarsVisible && round.bossBar != null) round.bossBar.addPlayer(player);
                 message(player, NamedTextColor.GREEN, "Deine pausierte Runde wurde fortgesetzt.");
                 checkpoint();
                 return;
@@ -682,7 +698,7 @@ public final class ChallengeService implements Listener {
         Player player = Bukkit.getPlayer(id);
         if (player != null) {
             applyBorder(player, round.chunk);
-            if (round.bossBar != null) round.bossBar.addPlayer(player);
+            if (run.bossBarsVisible && round.bossBar != null) round.bossBar.addPlayer(player);
         }
     }
 
@@ -705,7 +721,6 @@ public final class ChallengeService implements Listener {
             bar = Bukkit.createBossBar(displayName(round.entityTypeKey), BarColor.RED, BarStyle.SOLID);
         }
         bar.setTitle(displayName(round.entityTypeKey));
-        bar.setVisible(true);
         bar.setProgress(progress(mob));
         round.bossBar = bar;
         refreshRoundViewers(round);
@@ -714,6 +729,8 @@ public final class ChallengeService implements Listener {
     private void refreshRoundViewers(RoundState round) {
         if (round.bossBar == null) return;
         round.bossBar.removeAll();
+        round.bossBar.setVisible(run.bossBarsVisible);
+        if (!run.bossBarsVisible) return;
         for (UUID id : round.participants) {
             Player player = Bukkit.getPlayer(id);
             if (player != null) round.bossBar.addPlayer(player);

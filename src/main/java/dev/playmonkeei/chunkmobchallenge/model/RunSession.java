@@ -15,6 +15,7 @@ public final class RunSession {
     public int startedRounds;
     public boolean nameTagsVisible;
     public boolean glowing;
+    public boolean bossBarsVisible = true;
     public final Map<ChunkKey, RoundState> rounds = new LinkedHashMap<>();
     public final Map<UUID, PlayerState> players = new LinkedHashMap<>();
 

@@ -7,7 +7,7 @@ description: Sessionübergreifende Chunk-Mob-Challenge für Paper 26.1 und 26.2
 commands:
   chunkchallenge:
     description: Verwaltet die Chunk Mob Challenge
-    usage: /chunkchallenge <start|stop|status|reload|tags|glowing>
+    usage: /chunkchallenge <start|stop|status|reload|tags|glowing|bossbar>
     aliases: [cc]
 permissions:
   chunkchallenge.admin:
@@ -20,6 +20,7 @@ permissions:
       chunkchallenge.reload: true
       chunkchallenge.tags: true
       chunkchallenge.glowing: true
+      chunkchallenge.bossbar: true
   chunkchallenge.start:
     default: op
   chunkchallenge.stop:
@@ -31,4 +32,6 @@ permissions:
   chunkchallenge.tags:
     default: op
   chunkchallenge.glowing:
+    default: op
+  chunkchallenge.bossbar:
     default: op
