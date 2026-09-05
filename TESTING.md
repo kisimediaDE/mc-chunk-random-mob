@@ -6,7 +6,7 @@ werden.
 
 ## Aktueller Teststand
 
-Letzte Aktualisierung: **3. September 2026**
+Letzte Aktualisierung: **5. September 2026**
 
 - Manuell getestet: **Paper 26.2 Build 121**, Solo mit `playmonkeei`
 - Paper **26.1.2 Build 74**: Server- und Pluginstart mit 89 zur Laufzeit
@@ -22,8 +22,8 @@ Letzte Aktualisierung: **3. September 2026**
 - Gegenkompiliert: **Paper API 26.2 Build 121**
 - `[x]` bedeutet praktisch bestätigt; `[ ]` bleibt offen oder muss auf der
   zweiten Serverversion erneut geprüft werden.
-- Einziger noch offener Funktionsblock: Koop beziehungsweise Verhalten mit zwei
-  gleichzeitig verbundenen Spielern.
+- Alle vorgesehenen Solo-, Hardcore- und Koop-Funktionsblöcke wurden praktisch
+  bestätigt; es sind keine Checklistenpunkte mehr offen.
 - Der vollständige Solo-Run auf Paper 26.2 wurde nach **02:43:39 aktiver
   Spielzeit** mit **42 Mobs**, **56 Runden** und **15 Toden** durch den echten
   Vanilla-Enderdragon abgeschlossen.
@@ -203,10 +203,14 @@ kurz weiterlaufen gelassen und erst danach mit `stop` beendet wird.
 - [x] Allein in einer Runde sterben: Alte verwaiste Runde und Mob werden entfernt.
 - [x] Nach dem Respawn startet im Respawn-Chunk sofort eine neue Runde.
 - [x] Tode-Statistik erhöht sich um eins.
-- [ ] Zwei Spieler teilen eine Runde; einer stirbt: Mob und Runde bleiben für den
-      Überlebenden bestehen.
-- [ ] Der gestorbene Spieler startet nach dem Respawn seine eigene Runde oder
-      tritt einer dort bereits aktiven Runde bei.
+- [x] Zwei Spieler teilen eine Runde; `playmonkeei` stirbt: Tadpole und Runde 3
+      bleiben für `testmonkeei` `ACTIVE`; Todeszahl 1 und Rundenzahl 4.
+- [x] Der gestorbene `playmonkeei` startet nach dem Respawn seine eigene Runde:
+      Happy Ghast in Chunk `-8/-6`, während `testmonkeei` weiterhin Tadpole in
+      `-4/-4` zugeordnet ist. Die Tadpole-UUID blieb
+      `2073605173/860047051/-1675464186/1433787557`, Position
+      `-50.892688/59.947884/-62.546717`, Health `6.0`; beide Clients sahen nur
+      ihre jeweils eigene Bossbar und Border.
 
 ## 7. Hardcore-Tod
 
@@ -257,17 +261,58 @@ Danach `hardcore=false` zurücksetzen.
 
 ## 8. Koop und parallele Runden
 
-- [ ] Beim Start werden alle Online-Spieler zum Starter teleportiert.
-- [ ] Spieler im selben aktiven Chunk teilen Mob und Bossbar.
-- [ ] Nach dem Sieg bleibt Spieler A im sicheren Chunk.
-- [ ] Spieler B betritt Chunk B und startet dort eine Runde.
-- [ ] Spieler A betritt stattdessen Chunk C und startet parallel eine zweite Runde.
-- [ ] Beide Runden besitzen getrennte Mobs, Borders und Bossbars.
-- [ ] Betritt ein Spieler einen bereits umkämpften Chunk, tritt er der vorhandenen
-      Runde bei und erzeugt keinen zweiten Mob.
-- [ ] Loggt der letzte Spieler einer Runde aus, friert diese Runde ein.
-- [ ] Andere parallele Runden laufen weiter.
-- [ ] Beim erneuten Login wird der Spieler seiner ursprünglichen Runde zugeordnet.
+Für den lokalen Test ohne zweiten Minecraft-Account wird Paper 26.1.2 temporär
+mit `online-mode=false` auf `127.0.0.1` betrieben. Hauptspieler ist
+`playmonkeei`, der zweite Prism-Spieler heißt `testmonkeei`. Nach dem Test muss
+`online-mode=true` wiederhergestellt werden.
+
+- [x] Zwei getrennte Player-Entities sind gleichzeitig verbunden:
+      `playmonkeei` (`a4deb3fa-fcb4-3420-a18f-a679d90fe256`) und
+      `testmonkeei` (`7d650b54-2f80-3d97-810f-83c141961a4b`).
+
+- [x] Beim Start werden alle Online-Spieler zum Starter teleportiert:
+      `testmonkeei` wurde zuvor nach `1000/1000` versetzt und befand sich danach
+      gemeinsam mit `playmonkeei` in Chunk `-5/-4`.
+- [x] Spieler im selben aktiven Chunk teilen Mob und Bossbar. Beide
+      `/cc status`-Ausgaben zeigten dieselbe aktive Glow-Squid-Runde in Chunk
+      `-5/-4`; Mob-Bossbar und individuelle Worldborder waren in beiden
+      Clientfenstern sichtbar.
+- [x] Nach dem Sieg bleibt `playmonkeei` im sicheren Chunk; `/cc status` zeigt
+      dort keine eigene Runde.
+- [x] `testmonkeei` betritt Chunk B und startet dort allein Runde 2 mit Tadpole
+      in Chunk `-4/-4`. Nur sein Client sieht Bossbar und Border; seine
+      Lauf-/Flugbewegung über die Grenze wird blockiert. `playmonkeei` sieht im
+      sicheren Ausgangschunk weder Bossbar noch Border.
+- [x] `playmonkeei` betritt stattdessen Chunk C und startet parallel Runde 3 mit
+      Frog in Chunk `-6/-4`; die Tadpole-Runde von `testmonkeei` in `-4/-4`
+      bleibt gleichzeitig aktiv.
+- [x] Beide parallelen Runden besitzen getrennte Mobs, Borders und Bossbars:
+      `playmonkeei` sieht ausschließlich Frog, `testmonkeei` ausschließlich
+      Tadpole; beide Mobs existieren gleichzeitig und beide individuellen
+      Chunk-Sperren greifen.
+      Nach dem Ende ausschließlich der Frog-Runde blieb die Tadpole-Runde
+      unverändert `ACTIVE`; globale Statistik: 2 Mobs und 3 Runden.
+- [x] Betritt ein Spieler einen bereits umkämpften Chunk, tritt er der vorhandenen
+      Runde bei und erzeugt keinen zweiten Mob: Nach dem Teleport meldete
+      `playmonkeei` „Runde beigetreten“, beide Statusausgaben zeigten Tadpole in
+      `-4/-4`, die Rundenzahl blieb 3 und die einzige Tadpole-UUID blieb
+      `2073605173/860047051/-1675464186/1433787557`.
+- [x] Loggt der letzte Spieler einer Runde aus, friert diese Runde ein: Nach dem
+      Logout von `testmonkeei` speichert `state.yml` Tadpole in `-4/-4` als
+      `DORMANT`, weiterhin mit 6 HP und ausschließlich diesem Teilnehmer.
+- [x] Andere parallele Runden laufen weiter: Gleichzeitig blieb Happy Ghast in
+      `-8/-6` für `playmonkeei` `ACTIVE`; `/cc status` zeigte dessen eigene
+      aktive Runde und weiterlaufende Spielzeit.
+- [x] Beim erneuten Login wird der Spieler seiner ursprünglichen Runde zugeordnet:
+      `testmonkeei` erhält „Deine pausierte Runde wurde fortgesetzt“, kehrt zu
+      Tadpole in `-4/-4` zurück und sieht wieder eigene Bossbar und Border. UUID
+      und Health bleiben unverändert; `playmonkeei` bleibt getrennt bei Happy
+      Ghast.
+
+Der lokale Koop-Test wurde abgeschlossen und die Serverkonfiguration anschließend
+wieder auf `online-mode=true` gestellt. Der anschließende Neustart verhielt sich
+wie erwartet: Der echte Account `playmonkeei` kann regulär verbinden, während
+das lokale Prism-Offlinekonto `testmonkeei` abgewiesen wird.
 
 ## 9. Portale und Dimensionen
 
